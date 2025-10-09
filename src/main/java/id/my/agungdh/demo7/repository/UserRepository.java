@@ -1,46 +1,24 @@
 package id.my.agungdh.demo7.repository;
 
 import id.my.agungdh.demo7.entity.User;
-import jakarta.ejb.Stateless;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import jakarta.data.repository.CrudRepository;
+import jakarta.data.repository.Repository;
+import jakarta.data.repository.Query;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
-@Stateless
-public class UserRepository {
+@Repository
+public interface UserRepository extends CrudRepository<User, Long> {
 
-    @PersistenceContext
-    private EntityManager em;
+    // Biar kompatibel dengan pemanggilan lama & baru
+    Optional<User> findByEmail(String email);
+    Optional<User> findByEmailIgnoreCase(String email);
 
-    public User save(User user) {
-        if (user.getId() == null) {
-            em.persist(user);
-            return user;
-        } else {
-            return em.merge(user);
-        }
-    }
+    // Lebih efisien buat validasi unik
+    boolean existsByEmailIgnoreCase(String email);
 
-    public Optional<User> findById(Long id) {
-        return Optional.ofNullable(em.find(User.class, id));
-    }
-
-    public Optional<User> findByEmail(String email) {
-        return em.createQuery("SELECT u FROM User u WHERE LOWER(u.email) = LOWER(:email)", User.class)
-                .setParameter("email", email)
-                .getResultStream()
-                .findFirst();
-    }
-
-    public List<User> findAll() {
-        return em.createQuery("SELECT u FROM User u ORDER BY u.id", User.class)
-                .getResultList();
-    }
-
-    public void delete(Long id) {
-        User u = em.find(User.class, id);
-        if (u != null) em.remove(u);
-    }
+    // Contoh JDQL opsional
+    @Query("where lower(name) like lower(:pattern)")
+    Stream<User> findByNameLike(String pattern);
 }
