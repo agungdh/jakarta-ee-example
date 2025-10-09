@@ -1,0 +1,76 @@
+name: Build Jar (Maven) & Upload (Actions + Release)
+
+on:
+  push:
+    branches: [ master ]
+  release:
+    types: [ published ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    steps:
+      # Checkout ke tag release kalau event release published
+      - name: Checkout (release tag)
+        if: github.event_name == 'release'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      # Checkout default untuk push ke master / manual
+      - name: Checkout (branch)
+        if: github.event_name != 'release'
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+          cache: 'maven'
+
+      - name: Build JAR (skip tests)
+        run: |
+          chmod +x mvnw
+          ./mvnw -B -DskipTests package
+
+      - name: Locate runnable JAR
+        id: locate
+        shell: bash
+        run: |
+          set -euo pipefail
+          JARPATH=$(find target -maxdepth 1 -type f -name "*.jar" \
+            ! -name "*-sources.jar" ! -name "*-javadoc.jar" ! -name "original-*.jar" \
+            -printf "%T@ %p\n" | sort -nr | head -n1 | awk '{print $2}')
+          if [ -z "${JARPATH:-}" ] || [ ! -f "$JARPATH" ]; then
+            echo "JAR runnable tidak ditemukan di target/." >&2
+            ls -lah target || true
+            exit 1
+          fi
+          echo "jarpath=${JARPATH}" >> "$GITHUB_OUTPUT"
+          echo "jarname=$(basename "$JARPATH")" >> "$GITHUB_OUTPUT"
+
+      # Simpan sebagai artifact di Actions (nama tetap file .jar)
+      - name: Upload artifact (Actions tab)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.locate.outputs.jarname }}
+          path: ${{ steps.locate.outputs.jarpath }}
+          if-no-files-found: error
+          retention-days: 14
+
+      # Hanya saat release published: upload JAR ke halaman Release
+      - name: Upload JAR to Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.release.tag_name }}
+          files: ${{ steps.locate.outputs.jarpath }}
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
