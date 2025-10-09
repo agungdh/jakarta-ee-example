@@ -7,15 +7,9 @@
         <!-- Gunakan resource JNDI dari GlassFish -->
         <jta-data-source>jdbc/postgres</jta-data-source>
 
-        <!-- Kalau kamu punya entitas, tambahkan class-nya di sini
-             (tidak wajib kalau EclipseLink bisa scan otomatis) -->
-        <!--
-        <class>com.example.model.User</class>
-        -->
-
         <properties>
             <!-- Auto-create schema (khusus untuk pengembangan) -->
-            <property name="jakarta.persistence.schema-generation.database.action" value="create"/>
+            <property name="jakarta.persistence.schema-generation.database.action" value="drop-and-create"/>
 
             <!-- Logging EclipseLink -->
             <property name="eclipselink.logging.level" value="FINE"/>

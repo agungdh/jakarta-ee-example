@@ -6,20 +6,19 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(componentModel = "cdi",
-        unmappedTargetPolicy = ReportingPolicy.ERROR)
+@Mapper(
+        componentModel = "cdi",
+        unmappedTargetPolicy = ReportingPolicy.ERROR,
+        builder = @Builder(disableBuilder = true)
+)
 public interface UserMapper {
 
-    // Entity -> DTO
     UserDTO toDTO(User user);
-
     List<UserDTO> toDTOs(List<User> users);
 
-    // DTO -> Entity (untuk create). Id diabaikan (Entity tidak punya setter id).
-    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "id", ignore = true) // id di-generate DB
     User toEntity(UserDTO dto);
 
-    // Update entity yang sudah ada dari DTO (PUT)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     void updateEntityFromDto(UserDTO dto, @MappingTarget User entity);

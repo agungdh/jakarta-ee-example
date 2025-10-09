@@ -12,14 +12,16 @@ import java.util.List;
 @Stateless
 public class UserService {
 
+    // JANGAN final, JANGAN pakai @RequiredArgsConstructor/@AllArgsConstructor
     @Inject
     private UserRepository repo;
 
     @Inject
     private UserMapper mapper;
 
+    public UserService() { } // optional, no-arg constructor
+
     public UserDTO create(UserDTO dto) {
-        // pake existsBy... supaya ringkas & efisien
         if (repo.existsByEmailIgnoreCase(dto.email())) {
             throw new RuntimeException("Email already exists: " + dto.email());
         }
@@ -28,9 +30,8 @@ public class UserService {
     }
 
     public List<UserDTO> getAll() {
-        // Spec minta stream ditutup => pakai try-with-resources
-        try (var stream = repo.findAll()) {
-            return stream.map(mapper::toDTO).toList();
+        try (var s = repo.findAll()) {
+            return s.map(mapper::toDTO).toList();
         }
     }
 
@@ -39,24 +40,19 @@ public class UserService {
     }
 
     public UserDTO update(Long id, UserDTO dto) {
-        return repo.findById(id)
-                .map(existing -> {
-                    // Cek bentrok email dengan user lain
-                    repo.findByEmailIgnoreCase(dto.email())
-                            .filter(other -> !other.getId().equals(id))
-                            .ifPresent(u -> {
-                                throw new RuntimeException("Email already exists: " + dto.email());
-                            });
+        return repo.findById(id).map(existing -> {
+            repo.findByEmailIgnoreCase(dto.email())
+                    .filter(other -> !other.getId().equals(id))
+                    .ifPresent(u -> { throw new RuntimeException("Email already exists: " + dto.email()); });
 
-                    mapper.updateEntityFromDto(dto, existing);
-                    return mapper.toDTO(repo.save(existing));
-                })
-                .orElse(null);
+            mapper.updateEntityFromDto(dto, existing);
+            return mapper.toDTO(repo.save(existing));
+        }).orElse(null);
     }
 
     public boolean delete(Long id) {
         if (repo.findById(id).isPresent()) {
-            repo.deleteById(id); // <- jangan delete(id)
+            repo.deleteById(id);
             return true;
         }
         return false;
