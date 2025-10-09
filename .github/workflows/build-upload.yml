@@ -1,4 +1,4 @@
-name: Build Jar (Maven) & Upload (Actions + Release)
+name: Build WAR (Maven) & Upload (Actions + Release)
 
 on:
   push:
@@ -34,43 +34,43 @@ jobs:
           java-version: '21'
           cache: 'maven'
 
-      - name: Build JAR (skip tests)
+      - name: Build WAR (skip tests)
         run: |
           chmod +x mvnw
           ./mvnw -B -DskipTests package
 
-      - name: Locate runnable JAR
+      - name: Locate runnable WAR
         id: locate
         shell: bash
         run: |
           set -euo pipefail
-          JARPATH=$(find target -maxdepth 1 -type f -name "*.jar" \
-            ! -name "*-sources.jar" ! -name "*-javadoc.jar" ! -name "original-*.jar" \
+          WARPATH=$(find target -maxdepth 1 -type f -name "*.war" \
+            ! -name "*-sources.war" ! -name "*-javadoc.war" \
             -printf "%T@ %p\n" | sort -nr | head -n1 | awk '{print $2}')
-          if [ -z "${JARPATH:-}" ] || [ ! -f "$JARPATH" ]; then
-            echo "JAR runnable tidak ditemukan di target/." >&2
+          if [ -z "${WARPATH:-}" ] || [ ! -f "$WARPATH" ]; then
+            echo "WAR runnable tidak ditemukan di target/." >&2
             ls -lah target || true
             exit 1
           fi
-          echo "jarpath=${JARPATH}" >> "$GITHUB_OUTPUT"
-          echo "jarname=$(basename "$JARPATH")" >> "$GITHUB_OUTPUT"
+          echo "warpath=${WARPATH}" >> "$GITHUB_OUTPUT"
+          echo "warname=$(basename "$WARPATH")" >> "$GITHUB_OUTPUT"
 
-      # Simpan sebagai artifact di Actions (nama tetap file .jar)
+      # Simpan sebagai artifact di Actions (nama tetap file .war)
       - name: Upload artifact (Actions tab)
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.locate.outputs.jarname }}
-          path: ${{ steps.locate.outputs.jarpath }}
+          name: ${{ steps.locate.outputs.warname }}
+          path: ${{ steps.locate.outputs.warpath }}
           if-no-files-found: error
           retention-days: 14
 
-      # Hanya saat release published: upload JAR ke halaman Release
-      - name: Upload JAR to Release
+      # Hanya saat release published: upload WAR ke halaman Release
+      - name: Upload WAR to Release
         if: github.event_name == 'release'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.release.tag_name }}
-          files: ${{ steps.locate.outputs.jarpath }}
+          files: ${{ steps.locate.outputs.warpath }}
           generate_release_notes: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
