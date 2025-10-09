@@ -44,7 +44,9 @@ public class UserService {
                     // Cek bentrok email dengan user lain
                     repo.findByEmailIgnoreCase(dto.email())
                             .filter(other -> !other.getId().equals(id))
-                            .ifPresent(u -> { throw new RuntimeException("Email already exists: " + dto.email()); });
+                            .ifPresent(u -> {
+                                throw new RuntimeException("Email already exists: " + dto.email());
+                            });
 
                     mapper.updateEntityFromDto(dto, existing);
                     return mapper.toDTO(repo.save(existing));

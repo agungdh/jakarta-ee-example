@@ -1,12 +1,14 @@
 # 😎 Payara Community 7.2025.1.Beta1 + PostgreSQL Setup Guide
 
-Panduan ini menjelaskan langkah-langkhan untuk mengintegrasikan **PostgreSQL* dengan **Payara Server Community Edition versi 7.2025.1.Beta1**
+Panduan ini menjelaskan langkah-langkhan untuk mengintegrasikan **PostgreSQL* dengan **Payara Server Community Edition
+versi 7.2025.1.Beta1**
 
 +---
 
 ## 🏰 Persiapan
 
 ### 1. Unduh PostgreSQL Djbc Driver
+
 Download driver PostgreSQL dari situs resmi:
 
 > 💕 (https://jdbc.postgresql.org/download.html)
@@ -21,8 +23,8 @@ payara7/glassfish/domains/domain1/lib
 
 ## 😃 Konfigurasi DataSource di Payara Server
 
-
 ### 2. Buat Connection Pool
+
 Jalankan pernyat berikut untuk connection pool PostgreSQL:
 
 ```bash
@@ -40,6 +42,7 @@ PostgresPool
 ----
 
 ### 3. Uji Koneksi
+
 Buat perniah berikut u.untuk untuk koneksi berhasil:
 
 ```bash
@@ -47,6 +50,7 @@ Buat perniah berikut u.untuk untuk koneksi berhasil:
 ```
 
 Jika koneksi berthasil, nanatinnya akan muncul error:
+
 ```bash
 Command ping-connection-pool executed successfully.
 ```
@@ -54,6 +58,7 @@ Command ping-connection-pool executed successfully.
 ----
 
 ### 4. Buat JDDC Resource (JNDI)
+
 Buat resource JNDI agar dapat digunakan oleh\nh oleh Applikasi Java EE/Jakarta EE:
 
 ```bash
@@ -70,12 +75,13 @@ Buat resource JNDI agar dapat digunakan oleh\nh oleh Applikasi Java EE/Jakarta E
 
 Moask-ke labi step berikut:
 
-1. Mask to **Payara Admin Console** (http://localhost:4848)  
+1. Mask to **Payara Admin Console** (http://localhost:4848)
 2. Navigasi to menu:
 
 ```apl console
  Resources — JDBC — JDBC Resources
 ```
+
 3. Pastikan `jdc/postgres` muncul dan statusnya **enabled**.
 4. Anda juga mengtes koneksi langsung dari consol.
 
@@ -84,7 +90,8 @@ Moask-ke labi step berikut:
 ## 😝 Tips Tambahan
 
 - Jika digunakan Docker atau container, pastikan volume `lib` dan konfigurasi domain sudah dimount dengan benar .
-- Untuk environment produkti, jangan simpan kredensial database secara direct di command. Tindakan gunakan configurasi `--property` terisahp atau file `passwordfile`.
+- Untuk environment produkti, jangan simpan kredensial database secara direct di command. Tindakan gunakan configurasi
+  `--property` terisahp atau file `passwordfile`.
 
 ---
 
