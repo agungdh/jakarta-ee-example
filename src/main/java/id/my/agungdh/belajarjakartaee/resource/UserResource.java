@@ -7,6 +7,8 @@ import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Map;
@@ -14,25 +16,22 @@ import java.util.Map;
 @Path("/users")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@Slf4j
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED) // <-- penting untuk proxy CDI
 public class UserResource {
 
     @Inject
-    private UserService service;
+    UserService service;
 
     @GET
-    public List<UserDTO> getAll() {
-        return service.getAll();
-    }
+    public List<UserDTO> getAll() { return service.getAll(); }
 
-    @GET
-    @Path("/{id}")
+    @GET @Path("/{id}")
     public Response getById(@PathParam("id") Long id) {
         var user = service.getById(id);
-        if (user == null)
-            return Response.status(Response.Status.NOT_FOUND)
-                    .entity(Map.of("error", "User not found"))
-                    .build();
-        return Response.ok(user).build();
+        return (user == null)
+                ? Response.status(Response.Status.NOT_FOUND).entity(Map.of("error","User not found")).build()
+                : Response.ok(user).build();
     }
 
     @POST
@@ -41,25 +40,18 @@ public class UserResource {
         return Response.status(Response.Status.CREATED).entity(saved).build();
     }
 
-    @PUT
-    @Path("/{id}")
+    @PUT @Path("/{id}")
     public Response update(@PathParam("id") Long id, @Valid UserDTO dto) {
         var updated = service.update(id, dto);
-        if (updated == null)
-            return Response.status(Response.Status.NOT_FOUND)
-                    .entity(Map.of("error", "User not found"))
-                    .build();
-        return Response.ok(updated).build();
+        return (updated == null)
+                ? Response.status(Response.Status.NOT_FOUND).entity(Map.of("error","User not found")).build()
+                : Response.ok(updated).build();
     }
 
-    @DELETE
-    @Path("/{id}")
+    @DELETE @Path("/{id}")
     public Response delete(@PathParam("id") Long id) {
-        boolean removed = service.delete(id);
-        if (!removed)
-            return Response.status(Response.Status.NOT_FOUND)
-                    .entity(Map.of("error", "User not found"))
-                    .build();
-        return Response.noContent().build();
+        return service.delete(id)
+                ? Response.noContent().build()
+                : Response.status(Response.Status.NOT_FOUND).entity(Map.of("error","User not found")).build();
     }
 }
