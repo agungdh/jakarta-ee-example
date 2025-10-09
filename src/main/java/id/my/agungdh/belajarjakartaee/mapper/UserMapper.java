@@ -1,7 +1,7 @@
-package id.my.agungdh.demo7.mapper;
+package id.my.agungdh.belajarjakartaee.mapper;
 
-import id.my.agungdh.demo7.dto.UserDTO;
-import id.my.agungdh.demo7.entity.User;
+import id.my.agungdh.belajarjakartaee.dto.UserDTO;
+import id.my.agungdh.belajarjakartaee.entity.User;
 import org.mapstruct.*;
 
 import java.util.List;

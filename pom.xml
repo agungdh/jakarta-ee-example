@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>id.my.agungdh</groupId>
-    <artifactId>demo7</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <name>demo7</name>
+    <artifactId>belajar-jakarta-ee</artifactId>
+    <name>belajar-jakarta-ee</name>
+    <version>0.0.2</version>
     <packaging>war</packaging>
 
     <properties>

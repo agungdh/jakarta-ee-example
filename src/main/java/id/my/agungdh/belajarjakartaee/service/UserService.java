@@ -1,9 +1,9 @@
-package id.my.agungdh.demo7.service;
+package id.my.agungdh.belajarjakartaee.service;
 
-import id.my.agungdh.demo7.dto.UserDTO;
-import id.my.agungdh.demo7.entity.User;
-import id.my.agungdh.demo7.mapper.UserMapper;
-import id.my.agungdh.demo7.repository.UserRepository;
+import id.my.agungdh.belajarjakartaee.dto.UserDTO;
+import id.my.agungdh.belajarjakartaee.entity.User;
+import id.my.agungdh.belajarjakartaee.mapper.UserMapper;
+import id.my.agungdh.belajarjakartaee.repository.UserRepository;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 

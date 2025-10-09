@@ -1,4 +1,4 @@
-package id.my.agungdh.demo7.exception;
+package id.my.agungdh.belajarjakartaee.exception;
 
 import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.core.MediaType;

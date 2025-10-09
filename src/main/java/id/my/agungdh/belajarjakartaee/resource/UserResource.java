@@ -1,7 +1,7 @@
-package id.my.agungdh.demo7.resource;
+package id.my.agungdh.belajarjakartaee.resource;
 
-import id.my.agungdh.demo7.dto.UserDTO;
-import id.my.agungdh.demo7.service.UserService;
+import id.my.agungdh.belajarjakartaee.dto.UserDTO;
+import id.my.agungdh.belajarjakartaee.service.UserService;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;

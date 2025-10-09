@@ -1,4 +1,4 @@
-package id.my.agungdh.demo7.dto;
+package id.my.agungdh.belajarjakartaee.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

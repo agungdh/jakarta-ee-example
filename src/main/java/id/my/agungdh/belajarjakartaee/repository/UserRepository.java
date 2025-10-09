@@ -1,6 +1,6 @@
-package id.my.agungdh.demo7.repository;
+package id.my.agungdh.belajarjakartaee.repository;
 
-import id.my.agungdh.demo7.entity.User;
+import id.my.agungdh.belajarjakartaee.entity.User;
 import jakarta.data.repository.CrudRepository;
 import jakarta.data.repository.Query;
 import jakarta.data.repository.Repository;
