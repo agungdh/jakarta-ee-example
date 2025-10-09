@@ -2,6 +2,7 @@ package id.my.agungdh.demo7.service;
 
 import id.my.agungdh.demo7.dto.UserDTO;
 import id.my.agungdh.demo7.entity.User;
+import id.my.agungdh.demo7.mapper.UserMapper;
 import id.my.agungdh.demo7.repository.UserRepository;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
@@ -14,43 +15,42 @@ public class UserService {
     @Inject
     private UserRepository repo;
 
+    @Inject
+    private UserMapper mapper;
+
     public UserDTO create(UserDTO dto) {
         // Cek duplikat email
         if (repo.findByEmail(dto.email()).isPresent()) {
             throw new RuntimeException("Email already exists: " + dto.email());
         }
 
-        User user = new User(dto.name(), dto.email());
+        User user = mapper.toEntity(dto);
         User saved = repo.save(user);
-        return new UserDTO(saved.getId(), saved.getName(), saved.getEmail());
+        return mapper.toDTO(saved);
     }
 
     public List<UserDTO> getAll() {
-        return repo.findAll()
-                .stream()
-                .map(u -> new UserDTO(u.getId(), u.getName(), u.getEmail()))
-                .toList();
+        return mapper.toDTOs(repo.findAll());
     }
 
     public UserDTO getById(Long id) {
         return repo.findById(id)
-                .map(u -> new UserDTO(u.getId(), u.getName(), u.getEmail()))
+                .map(mapper::toDTO)
                 .orElse(null);
     }
 
     public UserDTO update(Long id, UserDTO dto) {
         return repo.findById(id)
-                .map(u -> {
-                    // cek jika email baru sudah digunakan user lain
+                .map(existing -> {
+                    // Cek email bentrok dengan user lain
                     if (repo.findByEmail(dto.email())
-                            .filter(existing -> !existing.getId().equals(id))
+                            .filter(other -> !other.getId().equals(id))
                             .isPresent()) {
                         throw new RuntimeException("Email already exists: " + dto.email());
                     }
-                    u.setName(dto.name());
-                    u.setEmail(dto.email());
-                    User updated = repo.save(u);
-                    return new UserDTO(updated.getId(), updated.getName(), updated.getEmail());
+                    mapper.updateEntityFromDto(dto, existing);
+                    User updated = repo.save(existing);
+                    return mapper.toDTO(updated);
                 })
                 .orElse(null);
     }
